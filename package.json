@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "seed:roles": "node src/config/seedRolesPermissions.js"
   },
   "keywords": ["nodejs", "express", "mongodb", "jwt", "swagger"],
   "author": "",

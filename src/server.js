@@ -50,6 +50,8 @@ app.get('/health', (req, res) => {
 const API_VERSION = process.env.API_VERSION || 'v1';
 app.use(`/api/${API_VERSION}/auth`, require('./routes/auth.routes'));
 app.use(`/api/${API_VERSION}/users`, require('./routes/user.routes'));
+app.use(`/api/${API_VERSION}/roles`, require('./routes/role.routes'));
+app.use(`/api/${API_VERSION}/permissions`, require('./routes/permission.routes'));
 
 // Root Route
 app.get('/', (req, res) => {
@@ -76,10 +78,10 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`
-    ╔════════════════════════════════════════════════════════════════
+    ╔═══════════════════════════════════════════════════════════════
     ║   Server running in ${process.env.NODE_ENV} mode               
     ║   Port: ${PORT}                                                
     ║   API Docs: http://localhost:${PORT}/api-docs                  
-    ╚════════════════════════════════════════════════════════════════
+    ╚═══════════════════════════════════════════════════════════════
   `);
 });

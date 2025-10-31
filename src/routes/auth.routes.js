@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
-const { protect } = require('../middleware/auth');
+const { protect, authorize, checkPermission } = require('../middleware/auth');
 
 /**
  * @swagger
@@ -12,10 +12,12 @@ const { protect } = require('../middleware/auth');
 
 /**
  * @swagger
- * /api/v1/auth/register:
+ * /api/v1/auth/create-user:
  *   post:
- *     summary: Register a new user
+ *     summary: Create a new user (Admin only)
  *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -36,13 +38,24 @@ const { protect } = require('../middleware/auth');
  *               password:
  *                 type: string
  *                 example: password123
+ *               roleName:
+ *                 type: string
+ *                 enum: [admin, user]
+ *                 example: user
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: User created successfully
  *       400:
  *         description: Bad request
+ *       403:
+ *         description: Forbidden - Admin only
  */
-router.post('/register', authController.register);
+router.post('/create-user', 
+  protect, 
+  authorize('admin'),
+  checkPermission('users', 'create'),
+  authController.createUser
+);
 
 /**
  * @swagger
@@ -62,10 +75,10 @@ router.post('/register', authController.register);
  *             properties:
  *               email:
  *                 type: string
- *                 example: john@example.com
+ *                 example: admin@example.com
  *               password:
  *                 type: string
- *                 example: password123
+ *                 example: Admin@123
  *     responses:
  *       200:
  *         description: Login successful
@@ -107,6 +120,15 @@ router.post('/refresh-token', authController.refreshToken);
  *     tags: [Authentication]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: Optional - logout from specific device
  *     responses:
  *       200:
  *         description: Logout successful

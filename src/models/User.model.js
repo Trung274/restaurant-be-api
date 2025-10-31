@@ -20,12 +20,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
     minlength: [6, 'Password must be at least 6 characters'],
-    select: false // Don't return password by default
+    select: false
   },
   role: {
-    type: String,
-    enum: ['user', 'admin'],
-    default: 'user'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Role',
+    required: true
   },
   isActive: {
     type: Boolean,
@@ -44,19 +44,32 @@ const userSchema = new mongoose.Schema({
   }],
   passwordChangedAt: Date,
   passwordResetToken: String,
-  passwordResetExpire: Date
+  passwordResetExpire: Date,
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
 
-// Index for better query performance
+// Indexes
 userSchema.index({ email: 1 });
+userSchema.index({ role: 1 });
+
+// Populate role khi query
+userSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'role',
+    select: 'name permissions'
+  });
+  next();
+});
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
-  // Only hash if password is modified
   if (!this.isModified('password')) {
     return next();
   }
@@ -82,6 +95,26 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
     return JWTTimestamp < changedTimestamp;
   }
   return false;
+};
+
+// Check if user has specific permission
+userSchema.methods.hasPermission = function(resource, action) {
+  if (!this.role || !this.role.permissions) return false;
+  
+  return this.role.permissions.some(permission => 
+    permission.resource === resource && 
+    permission.action === action &&
+    permission.isActive
+  );
+};
+
+// Check if user has any of the permissions
+userSchema.methods.hasAnyPermission = function(permissionsToCheck) {
+  if (!this.role || !this.role.permissions) return false;
+  
+  return permissionsToCheck.some(({ resource, action }) => 
+    this.hasPermission(resource, action)
+  );
 };
 
 // Remove sensitive data when converting to JSON
