@@ -3,10 +3,11 @@ const mongoose = require('mongoose');
 const Role = require('../models/Role.model');
 const Permission = require('../models/Permission.model');
 const User = require('../models/User.model');
+const Restaurant = require('../models/Restaurant.model');
 
 // Kết nối database
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✓ MongoDB Connected'))
+  .then(() => console.log('✔ MongoDB Connected'))
   .catch(err => {
     console.error('MongoDB connection error:', err);
     process.exit(1);
@@ -20,9 +21,10 @@ const seedData = async () => {
     await Permission.deleteMany({});
     await Role.deleteMany({});
     await User.deleteMany({});
-    console.log('✓ Cleared old data');
+    await Restaurant.deleteMany({});
+    console.log('✔ Cleared old data');
 
-    // 1. Tạo Permissions
+    // ==================== PERMISSIONS ====================
     const permissions = await Permission.insertMany([
       // User Management
       { resource: 'users', action: 'create', description: 'Create new users' },
@@ -45,24 +47,32 @@ const seedData = async () => {
       { resource: 'permissions', action: 'delete', description: 'Delete permissions' },
       { resource: 'permissions', action: 'list', description: 'List all permissions' },
 
+      // Restaurant Management
+      { resource: 'restaurant', action: 'read', description: 'View restaurant information' },
+      { resource: 'restaurant', action: 'update', description: 'Update restaurant information' },
+
       // Profile Management (cho user thường)
       { resource: 'profile', action: 'read', description: 'View own profile' },
       { resource: 'profile', action: 'update', description: 'Update own profile' },
     ]);
-    console.log('✓ Created permissions');
+    console.log('✔ Created permissions');
 
-    // 2. Tạo Admin Role (full permissions)
+    // ==================== ROLES ====================
+    // Admin Role (full permissions)
     const adminPermissions = permissions.map(p => p._id);
     const adminRole = await Role.create({
       name: 'admin',
       description: 'Administrator with full access',
       permissions: adminPermissions
     });
-    console.log('✓ Created admin role');
+    console.log('✔ Created admin role');
 
-    // 3. Tạo User Role (limited permissions)
+    // User Role (limited permissions)
     const userPermissions = permissions
-      .filter(p => p.resource === 'profile')
+      .filter(p =>
+        p.resource === 'profile' ||
+        (p.resource === 'restaurant' && p.action === 'read')
+      )
       .map(p => p._id);
 
     const userRole = await Role.create({
@@ -70,29 +80,44 @@ const seedData = async () => {
       description: 'Regular user with limited access',
       permissions: userPermissions
     });
-    console.log('✓ Created user role');
+    console.log('✔ Created user role');
 
-    // 4. Tạo tài khoản Admin mặc định (optional)
+    // ==================== DEFAULT DATA ====================
+    // Tạo tài khoản Admin mặc định
     const adminExists = await User.findOne({ email: 'admin@example.com' });
     if (!adminExists) {
       await User.create({
         name: 'System Admin',
         email: 'admin@example.com',
-        password: 'Admin@123', // Đổi password này trong production!
+        password: 'Admin@123', 
         role: adminRole._id,
         isActive: true
       });
-      console.log('✓ Created default admin account');
+      console.log('✔ Created default admin account');
       console.log('  Email: admin@example.com');
       console.log('  Password: Admin@123');
       console.log('  ⚠️  CHANGE THIS PASSWORD IN PRODUCTION!');
     }
 
+    // Tạo Restaurant mặc định
+    await Restaurant.create({
+      name: 'Nhà hàng Chim lớn',
+      phone: '093456789',
+      email: 'restaurant@example.com',
+      address: '18 Hoàng Quốc Việt, Nghĩa Đô, Cầu Giấy, Hà Nội',
+      openTime: '08:00',
+      closeTime: '22:00',
+      description: 'Nhà hàng chuyên phục vụ các món ăn ngon'
+    });
+    console.log('✔ Created default restaurant');
+
+    // ==================== SUMMARY ====================
     console.log('\n🎉 Seed completed successfully!');
     console.log(`\n📊 Summary:`);
     console.log(`   Permissions: ${permissions.length}`);
     console.log(`   Roles: 2 (admin, user)`);
     console.log(`   Users: ${adminExists ? 'Admin already exists' : '1 admin created'}`);
+    console.log(`   Restaurant: 1 default restaurant created`);
 
     process.exit(0);
   } catch (error) {

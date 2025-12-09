@@ -8,6 +8,7 @@ const connectDB = require('./config/database');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 const errorHandler = require('./middleware/errorHandler');
+const restaurantRoutes = require('./routes/restaurant.routes');
 
 // Connect to MongoDB
 connectDB();
@@ -52,6 +53,7 @@ app.use(`/api/${API_VERSION}/auth`, require('./routes/auth.routes'));
 app.use(`/api/${API_VERSION}/users`, require('./routes/user.routes'));
 app.use(`/api/${API_VERSION}/roles`, require('./routes/role.routes'));
 app.use(`/api/${API_VERSION}/permissions`, require('./routes/permission.routes'));
+app.use('/api/v1/restaurant', restaurantRoutes);
 
 // Root Route
 app.get('/', (req, res) => {
@@ -78,10 +80,10 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`
-    ╔═══════════════════════════════════════════════════════════════
-    ║   Server running in ${process.env.NODE_ENV} mode               
-    ║   Port: ${PORT}                                                
-    ║   API Docs: http://localhost:${PORT}/api-docs                  
-    ╚═══════════════════════════════════════════════════════════════
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║   Server running in ${process.env.NODE_ENV} mode                          ║ 
+    ║   Port: ${PORT}                                                  ║ 
+    ║   API Docs: http://localhost:${PORT}/api-docs                    ║ 
+    ╚═══════════════════════════════════════════════════════════════╝
   `);
 });
