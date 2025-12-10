@@ -59,7 +59,10 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   // Fields that can be updated
   const fieldsToUpdate = {
     name: req.body.name,
-    email: req.body.email
+    email: req.body.email,
+    avatar: req.body.avatar,
+    phone: req.body.phone,
+    bio: req.body.bio
   };
 
   // Only admin can update role

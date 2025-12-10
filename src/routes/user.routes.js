@@ -85,6 +85,15 @@ router.get('/:id', protect, userController.getUserById);
  *                 type: string
  *               email:
  *                 type: string
+ *               avatar:
+ *                 type: string
+ *                 description: URL of user avatar image
+ *               phone:
+ *                 type: string
+ *                 description: User phone number (10-15 digits)
+ *               bio:
+ *                 type: string
+ *                 description: User biography (max 500 characters)
  *     responses:
  *       200:
  *         description: User updated

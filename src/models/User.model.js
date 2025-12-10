@@ -16,6 +16,26 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email']
   },
+  avatar: {
+    type: String,
+    default: null
+  },
+  phone: {
+    type: String,
+    default: null,
+    validate: {
+      validator: function (v) {
+        if (!v) return true; // Allow null/empty
+        return /^[0-9]{10,15}$/.test(v.replace(/[\s\-\(\)]/g, ''));
+      },
+      message: 'Please provide a valid phone number (10-15 digits)'
+    }
+  },
+  bio: {
+    type: String,
+    default: null,
+    maxlength: [500, 'Bio cannot be more than 500 characters']
+  },
   password: {
     type: String,
     required: [true, 'Please provide a password'],
@@ -60,7 +80,7 @@ userSchema.index({ email: 1 });
 userSchema.index({ role: 1 });
 
 // Populate role khi query
-userSchema.pre(/^find/, function(next) {
+userSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'role',
     select: 'name permissions'
@@ -69,7 +89,7 @@ userSchema.pre(/^find/, function(next) {
 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
   }
@@ -84,12 +104,12 @@ userSchema.pre('save', async function(next) {
 });
 
 // Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // Check if password was changed after JWT was issued
-userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
     return JWTTimestamp < changedTimestamp;
@@ -98,27 +118,27 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
 };
 
 // Check if user has specific permission
-userSchema.methods.hasPermission = function(resource, action) {
+userSchema.methods.hasPermission = function (resource, action) {
   if (!this.role || !this.role.permissions) return false;
-  
-  return this.role.permissions.some(permission => 
-    permission.resource === resource && 
+
+  return this.role.permissions.some(permission =>
+    permission.resource === resource &&
     permission.action === action &&
     permission.isActive
   );
 };
 
 // Check if user has any of the permissions
-userSchema.methods.hasAnyPermission = function(permissionsToCheck) {
+userSchema.methods.hasAnyPermission = function (permissionsToCheck) {
   if (!this.role || !this.role.permissions) return false;
-  
-  return permissionsToCheck.some(({ resource, action }) => 
+
+  return permissionsToCheck.some(({ resource, action }) =>
     this.hasPermission(resource, action)
   );
 };
 
 // Remove sensitive data when converting to JSON
-userSchema.methods.toJSON = function() {
+userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
   delete user.refreshTokens;
