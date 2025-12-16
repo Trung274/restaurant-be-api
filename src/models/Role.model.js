@@ -7,7 +7,7 @@ const roleSchema = new mongoose.Schema({
     unique: true,
     trim: true,
     lowercase: true,
-    enum: ['admin', 'user'], // Có thể thêm roles khác sau
+    enum: ['admin', 'user', 'operations', 'manager', 'accountant'],
   },
   description: {
     type: String,
@@ -31,7 +31,7 @@ const roleSchema = new mongoose.Schema({
 roleSchema.index({ name: 1 });
 
 // Populate permissions khi query
-roleSchema.pre(/^find/, function(next) {
+roleSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'permissions',
     select: 'resource action description'

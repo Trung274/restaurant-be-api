@@ -82,6 +82,30 @@ const seedData = async () => {
     });
     console.log('✔ Created user role');
 
+    // Operations Role (same permissions as user)
+    const operationsRole = await Role.create({
+      name: 'operations',
+      description: 'Operations staff with user-level access',
+      permissions: userPermissions
+    });
+    console.log('✔ Created operations role');
+
+    // Manager Role (same permissions as user)
+    const managerRole = await Role.create({
+      name: 'manager',
+      description: 'Manager with user-level access',
+      permissions: userPermissions
+    });
+    console.log('✔ Created manager role');
+
+    // Accountant Role (same permissions as user)
+    const accountantRole = await Role.create({
+      name: 'accountant',
+      description: 'Accountant with user-level access',
+      permissions: userPermissions
+    });
+    console.log('✔ Created accountant role');
+
     // ==================== DEFAULT DATA ====================
     // Tạo tài khoản Admin mặc định
     const adminExists = await User.findOne({ email: 'admin@example.com' });
@@ -89,7 +113,7 @@ const seedData = async () => {
       await User.create({
         name: 'System Admin',
         email: 'admin@example.com',
-        password: 'Admin@123', 
+        password: 'Admin@123',
         role: adminRole._id,
         isActive: true
       });
@@ -102,7 +126,7 @@ const seedData = async () => {
     // Tạo Restaurant mặc định
     await Restaurant.create({
       name: 'Nhà hàng Chim lớn',
-      phone: '093456789',
+      phone: '0934567890',
       email: 'restaurant@example.com',
       address: '18 Hoàng Quốc Việt, Nghĩa Đô, Cầu Giấy, Hà Nội',
       openTime: '08:00',
@@ -115,7 +139,7 @@ const seedData = async () => {
     console.log('\n🎉 Seed completed successfully!');
     console.log(`\n📊 Summary:`);
     console.log(`   Permissions: ${permissions.length}`);
-    console.log(`   Roles: 2 (admin, user)`);
+    console.log(`   Roles: 5 (admin, user, operations, manager, accountant)`);
     console.log(`   Users: ${adminExists ? 'Admin already exists' : '1 admin created'}`);
     console.log(`   Restaurant: 1 default restaurant created`);
 
