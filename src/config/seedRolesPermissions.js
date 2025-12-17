@@ -54,6 +54,13 @@ const seedData = async () => {
       // Profile Management (cho user thường)
       { resource: 'profile', action: 'read', description: 'View own profile' },
       { resource: 'profile', action: 'update', description: 'Update own profile' },
+
+      // Menu Items Management
+      { resource: 'menu-items', action: 'create', description: 'Create menu items' },
+      { resource: 'menu-items', action: 'read', description: 'View menu items' },
+      { resource: 'menu-items', action: 'update', description: 'Update menu items' },
+      { resource: 'menu-items', action: 'delete', description: 'Delete menu items' },
+      { resource: 'menu-items', action: 'list', description: 'List all menu items' },
     ]);
     console.log('✔ Created permissions');
 
@@ -90,11 +97,19 @@ const seedData = async () => {
     });
     console.log('✔ Created operations role');
 
-    // Manager Role (same permissions as user)
+    // Manager Role (menu management permissions)
+    const managerPermissions = permissions
+      .filter(p =>
+        p.resource === 'profile' ||
+        p.resource === 'menu-items' ||
+        (p.resource === 'restaurant' && p.action === 'read')
+      )
+      .map(p => p._id);
+
     const managerRole = await Role.create({
       name: 'manager',
-      description: 'Manager with user-level access',
-      permissions: userPermissions
+      description: 'Manager with menu management access',
+      permissions: managerPermissions
     });
     console.log('✔ Created manager role');
 
