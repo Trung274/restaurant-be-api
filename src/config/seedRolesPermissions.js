@@ -61,6 +61,17 @@ const seedData = async () => {
       { resource: 'menu-items', action: 'update', description: 'Update menu items' },
       { resource: 'menu-items', action: 'delete', description: 'Delete menu items' },
       { resource: 'menu-items', action: 'list', description: 'List all menu items' },
+
+      // Table Management
+      { resource: 'tables', action: 'create', description: 'Create new tables' },
+      { resource: 'tables', action: 'read', description: 'View table details' },
+      { resource: 'tables', action: 'update', description: 'Update table configuration' },
+      { resource: 'tables', action: 'delete', description: 'Delete tables' },
+      { resource: 'tables', action: 'list', description: 'List all tables' },
+      { resource: 'tables', action: 'check-in', description: 'Check-in table' },
+      { resource: 'tables', action: 'reserve', description: 'Reserve table' },
+      { resource: 'tables', action: 'checkout', description: 'Checkout table' },
+      { resource: 'tables', action: 'clean', description: 'Clean table' },
     ]);
     console.log('✔ Created permissions');
 
@@ -89,19 +100,28 @@ const seedData = async () => {
     });
     console.log('✔ Created user role');
 
-    // Operations Role (same permissions as user)
+    // Operations Role (table operations permissions)
+    const operationsPermissions = permissions
+      .filter(p =>
+        p.resource === 'profile' ||
+        (p.resource === 'restaurant' && p.action === 'read') ||
+        (p.resource === 'tables' && ['read', 'list', 'check-in', 'reserve', 'checkout', 'clean'].includes(p.action))
+      )
+      .map(p => p._id);
+
     const operationsRole = await Role.create({
       name: 'operations',
-      description: 'Operations staff with user-level access',
-      permissions: userPermissions
+      description: 'Operations staff with table management access',
+      permissions: operationsPermissions
     });
     console.log('✔ Created operations role');
 
-    // Manager Role (menu management permissions)
+    // Manager Role (menu and table management permissions)
     const managerPermissions = permissions
       .filter(p =>
         p.resource === 'profile' ||
         p.resource === 'menu-items' ||
+        p.resource === 'tables' ||
         (p.resource === 'restaurant' && p.action === 'read')
       )
       .map(p => p._id);

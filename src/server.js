@@ -54,6 +54,7 @@ app.use(`/api/${API_VERSION}/users`, require('./routes/user.routes'));
 app.use(`/api/${API_VERSION}/roles`, require('./routes/role.routes'));
 app.use(`/api/${API_VERSION}/permissions`, require('./routes/permission.routes'));
 app.use(`/api/${API_VERSION}/menu-items`, require('./routes/menuItem.routes'));
+app.use(`/api/${API_VERSION}/tables`, require('./routes/table.routes'));
 app.use('/api/v1/restaurant', restaurantRoutes);
 
 // Root Route

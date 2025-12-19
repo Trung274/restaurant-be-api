@@ -7,9 +7,16 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "jest --coverage",
-    "seed:roles": "node src/config/seedRolesPermissions.js"
+    "seed:roles": "node src/config/seedRolesPermissions.js",
+    "seed:tables": "node src/config/seedTables.js"
   },
-  "keywords": ["nodejs", "express", "mongodb", "jwt", "swagger"],
+  "keywords": [
+    "nodejs",
+    "express",
+    "mongodb",
+    "jwt",
+    "swagger"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
