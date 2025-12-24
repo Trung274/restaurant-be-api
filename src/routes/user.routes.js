@@ -41,6 +41,40 @@ router.get('/', protect, authorize('admin'), userController.getAllUsers);
 
 /**
  * @swagger
+ * /api/v1/users/change-password:
+ *   put:
+ *     summary: Change password
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 description: Current password for verification
+ *               newPassword:
+ *                 type: string
+ *                 description: New password (minimum 6 characters)
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Current password is incorrect
+ */
+router.put('/change-password', protect, userController.changePassword);
+
+/**
+ * @swagger
  * /api/v1/users/{id}:
  *   get:
  *     summary: Get user by ID
@@ -101,6 +135,8 @@ router.get('/:id', protect, userController.getUserById);
  *         description: User not found
  */
 router.put('/:id', protect, userController.updateUser);
+
+
 
 /**
  * @swagger

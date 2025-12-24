@@ -108,3 +108,43 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
     data: {}
   });
 });
+
+// @desc    Change password
+// @route   PUT /api/v1/users/change-password
+// @access  Private
+exports.changePassword = asyncHandler(async (req, res, next) => {
+  const { currentPassword, newPassword } = req.body;
+
+  // Validate input
+  if (!currentPassword || !newPassword) {
+    return next(new ErrorResponse('Please provide current password and new password', 400));
+  }
+
+  // Validate new password length
+  if (newPassword.length < 6) {
+    return next(new ErrorResponse('New password must be at least 6 characters', 400));
+  }
+
+  // Get user with password field
+  const user = await User.findById(req.user.id).select('+password');
+
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  // Verify current password
+  const isPasswordCorrect = await user.comparePassword(currentPassword);
+  if (!isPasswordCorrect) {
+    return next(new ErrorResponse('Current password is incorrect', 401));
+  }
+
+  // Update password and timestamp
+  user.password = newPassword;
+  user.passwordChangedAt = Date.now();
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Password changed successfully'
+  });
+});
