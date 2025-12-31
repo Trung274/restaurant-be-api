@@ -51,6 +51,20 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  shift: {
+    type: String,
+    default: null,
+    trim: true,
+    maxlength: [50, 'Shift cannot be more than 50 characters']
+  },
+  workStatus: {
+    type: String,
+    enum: {
+      values: ['active', 'on_leave', 'inactive'],
+      message: 'Work status must be either active, on_leave, or inactive'
+    },
+    default: 'active'
+  },
   refreshTokens: [{
     token: {
       type: String,

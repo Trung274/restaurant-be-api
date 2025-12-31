@@ -42,13 +42,29 @@ exports.createUser = asyncHandler(async (req, res, next) => {
   }
 
   // Create user
-  const user = await User.create({
+  const userData = {
     name,
     email,
     password,
     role: role._id,
     createdBy: req.user._id
-  });
+  };
+
+  // Optional fields for employee management
+  if (req.body.shift !== undefined) {
+    userData.shift = req.body.shift;
+  }
+
+  if (req.body.workStatus !== undefined) {
+    userData.workStatus = req.body.workStatus;
+  }
+
+  if (req.body.isActive !== undefined) {
+    userData.isActive = req.body.isActive;
+  }
+
+  const user = await User.create(userData);
+
 
   res.status(201).json({
     success: true,

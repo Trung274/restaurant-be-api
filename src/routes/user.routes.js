@@ -41,6 +41,70 @@ router.get('/', protect, authorize('admin'), userController.getAllUsers);
 
 /**
  * @swagger
+ * /api/v1/users/stats:
+ *   get:
+ *     summary: Get user statistics (Admin/Manager only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                       description: Total number of users
+ *                     active:
+ *                       type: integer
+ *                       description: Number of active users
+ *                     inactive:
+ *                       type: integer
+ *                       description: Number of inactive users
+ *                     byRole:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           role:
+ *                             type: string
+ *                           count:
+ *                             type: integer
+ *                     byWorkStatus:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           status:
+ *                             type: string
+ *                           count:
+ *                             type: integer
+ *                     byShift:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           shift:
+ *                             type: string
+ *                           count:
+ *                             type: integer
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
+router.get('/stats', protect, authorize('admin', 'manager'), userController.getUserStats);
+
+/**
+ * @swagger
  * /api/v1/users/change-password:
  *   put:
  *     summary: Change password
@@ -100,6 +164,12 @@ router.get('/:id', protect, userController.getUserById);
  * /api/v1/users/{id}:
  *   put:
  *     summary: Update user
+ *     description: |
+ *       Update user information.
+ *       **Permissions:**
+ *       * **Admin**: Can update ALL fields for ANY user.
+ *       * **Manager**: Can update `shift` and `workStatus` for ANY user; can update OWN personal info; CANNOT update personal info of others.
+ *       * **User/Owner**: Can ONLY update OWN personal info (name, email, avatar, phone, bio).
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -128,6 +198,16 @@ router.get('/:id', protect, userController.getUserById);
  *               bio:
  *                 type: string
  *                 description: User biography (max 500 characters)
+ *               shift:
+ *                 type: string
+ *                 description: Work shift - Admin/Manager only
+ *               workStatus:
+ *                 type: string
+ *                 enum: [active, on_leave, inactive]
+ *                 description: Work status - Admin/Manager only
+ *               isActive:
+ *                 type: boolean
+ *                 description: Account active status - Admin only
  *     responses:
  *       200:
  *         description: User updated

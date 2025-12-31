@@ -40,8 +40,21 @@ const { protect, authorize, checkPermission } = require('../middleware/auth');
  *                 example: password123
  *               roleName:
  *                 type: string
- *                 enum: [admin, user]
+ *                 enum: [admin, user, manager, operations, accountant]
  *                 example: user
+ *               shift:
+ *                 type: string
+ *                 description: Work shift
+ *                 example: Morning
+ *               workStatus:
+ *                 type: string
+ *                 enum: [active, on_leave, inactive]
+ *                 description: Work status
+ *                 example: active
+ *               isActive:
+ *                 type: boolean
+ *                 description: Account active status
+ *                 example: true
  *     responses:
  *       201:
  *         description: User created successfully
@@ -50,8 +63,8 @@ const { protect, authorize, checkPermission } = require('../middleware/auth');
  *       403:
  *         description: Forbidden - Admin only
  */
-router.post('/create-user', 
-  protect, 
+router.post('/create-user',
+  protect,
   authorize('admin'),
   checkPermission('users', 'create'),
   authController.createUser

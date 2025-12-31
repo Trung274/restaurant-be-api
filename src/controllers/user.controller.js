@@ -26,6 +26,90 @@ exports.getAllUsers = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Get user statistics
+// @route   GET /api/v1/users/stats
+// @access  Private/Admin/Manager
+exports.getUserStats = asyncHandler(async (req, res, next) => {
+  const totalUsers = await User.countDocuments();
+  const activeUsers = await User.countDocuments({ isActive: true });
+  const inactiveUsers = await User.countDocuments({ isActive: false });
+
+  // Group by role
+  const usersByRole = await User.aggregate([
+    {
+      $lookup: {
+        from: 'roles',
+        localField: 'role',
+        foreignField: '_id',
+        as: 'roleInfo'
+      }
+    },
+    {
+      $unwind: '$roleInfo'
+    },
+    {
+      $group: {
+        _id: '$roleInfo.name',
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        role: '$_id',
+        count: 1
+      }
+    }
+  ]);
+
+  // Group by work status
+  const usersByWorkStatus = await User.aggregate([
+    {
+      $group: {
+        _id: '$workStatus',
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        status: '$_id',
+        count: 1
+      }
+    }
+  ]);
+
+  // Group by shift
+  const usersByShift = await User.aggregate([
+    {
+      $group: {
+        _id: '$shift',
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        shift: '$_id',
+        count: 1
+      }
+    }
+  ]);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      total: totalUsers,
+      active: activeUsers,
+      inactive: inactiveUsers,
+      byRole: usersByRole,
+      byWorkStatus: usersByWorkStatus,
+      byShift: usersByShift
+    }
+  });
+});
+
+
 // @desc    Get single user
 // @route   GET /api/v1/users/:id
 // @access  Private
@@ -51,24 +135,43 @@ exports.getUserById = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/users/:id
 // @access  Private
 exports.updateUser = asyncHandler(async (req, res, next) => {
-  // Users can only update their own profile unless they're admin
-  if (req.user.id !== req.params.id && req.user.role !== 'admin') {
+  const isOwner = req.user.id === req.params.id;
+  const isAdmin = req.user.role.name === 'admin';
+  const isManager = req.user.role.name === 'manager';
+
+  // Authorization: Owner, Admin, or Manager
+  if (!isOwner && !isAdmin && !isManager) {
     return next(new ErrorResponse('Not authorized to update this user', 403));
   }
 
-  // Fields that can be updated
-  const fieldsToUpdate = {
-    name: req.body.name,
-    email: req.body.email,
-    avatar: req.body.avatar,
-    phone: req.body.phone,
-    bio: req.body.bio
-  };
+  const fieldsToUpdate = {};
 
-  // Only admin can update role
-  if (req.user.role === 'admin' && req.body.role) {
-    fieldsToUpdate.role = req.body.role;
+  // Standard fields - Owner or Admin only
+  if (isOwner || isAdmin) {
+    if (req.body.name !== undefined) fieldsToUpdate.name = req.body.name;
+    if (req.body.email !== undefined) fieldsToUpdate.email = req.body.email;
+    if (req.body.avatar !== undefined) fieldsToUpdate.avatar = req.body.avatar;
+    if (req.body.phone !== undefined) fieldsToUpdate.phone = req.body.phone;
+    if (req.body.bio !== undefined) fieldsToUpdate.bio = req.body.bio;
   }
+
+  // Admin only fields
+  if (isAdmin) {
+    if (req.body.role) fieldsToUpdate.role = req.body.role;
+    if (req.body.isActive !== undefined) fieldsToUpdate.isActive = req.body.isActive;
+  }
+
+  // Admin & Manager fields (Shift & Work Status)
+  if (isAdmin || isManager) {
+    if (req.body.shift !== undefined) fieldsToUpdate.shift = req.body.shift;
+    if (req.body.workStatus !== undefined) fieldsToUpdate.workStatus = req.body.workStatus;
+  }
+
+  // If no fields allowed to update
+  if (Object.keys(fieldsToUpdate).length === 0) {
+    return next(new ErrorResponse('No valid fields to update', 400));
+  }
+
 
   const user = await User.findByIdAndUpdate(
     req.params.id,

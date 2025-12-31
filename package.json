@@ -8,7 +8,12 @@
     "dev": "nodemon src/server.js",
     "test": "jest --coverage",
     "seed:roles": "node src/config/seedRolesPermissions.js",
-    "seed:tables": "node src/config/seedTables.js"
+    "seed:admin": "node src/config/seedDefaultAdmin.js",
+    "seed:restaurant": "node src/config/seedRestaurant.js",
+    "seed:tables": "node src/config/seedTables.js",
+    "seed:menu": "node src/config/seedMenuItems.js",
+    "seed:users": "node src/config/seedUsers.js",
+    "seed:all": "node src/config/seedAll.js"
   },
   "keywords": [
     "nodejs",
