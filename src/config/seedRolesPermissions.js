@@ -68,6 +68,20 @@ const seedRolesPermissions = async () => {
       { resource: 'tables', action: 'reserve', description: 'Reserve table' },
       { resource: 'tables', action: 'checkout', description: 'Checkout table' },
       { resource: 'tables', action: 'clean', description: 'Clean table' },
+
+      // Orders Management
+      { resource: 'orders', action: 'create', description: 'Create orders' },
+      { resource: 'orders', action: 'read', description: 'View orders' },
+      { resource: 'orders', action: 'update', description: 'Update orders' },
+      { resource: 'orders', action: 'serve', description: 'Mark items as served' },
+      { resource: 'orders', action: 'cancel', description: 'Cancel orders' },
+
+      // Kitchen Operations
+      { resource: 'kitchen', action: 'read', description: 'View kitchen queue' },
+      { resource: 'kitchen', action: 'start', description: 'Start preparing items' },
+      { resource: 'kitchen', action: 'ready', description: 'Mark items as ready' },
+      { resource: 'kitchen', action: 'priority', description: 'Update item priority' },
+      { resource: 'kitchen', action: 'stats', description: 'View kitchen stats' },
     ]);
     console.log('✔ Created permissions');
 
@@ -96,35 +110,40 @@ const seedRolesPermissions = async () => {
     });
     console.log('✔ Created user role');
 
-    // Operations Role (table operations permissions)
+    // Operations Role (table operations + orders + kitchen read)
     const operationsPermissions = permissions
       .filter(p =>
         p.resource === 'profile' ||
         (p.resource === 'restaurant' && p.action === 'read') ||
-        (p.resource === 'tables' && ['read', 'list', 'check-in', 'reserve', 'checkout', 'clean'].includes(p.action))
+        (p.resource === 'tables' && ['read', 'list', 'check-in', 'reserve', 'checkout', 'clean'].includes(p.action)) ||
+        (p.resource === 'menu-items' && ['read', 'list'].includes(p.action)) ||
+        (p.resource === 'orders' && ['create', 'read', 'serve'].includes(p.action)) ||
+        (p.resource === 'kitchen' && p.action === 'read')
       )
       .map(p => p._id);
 
     await Role.create({
       name: 'operations',
-      description: 'Operations staff with table management access',
+      description: 'Operations staff with table, order, and kitchen queue access',
       permissions: operationsPermissions
     });
     console.log('✔ Created operations role');
 
-    // Manager Role (menu and table management permissions)
+    // Manager Role (full menu, table, orders, and kitchen management)
     const managerPermissions = permissions
       .filter(p =>
         p.resource === 'profile' ||
         p.resource === 'menu-items' ||
         p.resource === 'tables' ||
+        p.resource === 'orders' ||
+        p.resource === 'kitchen' ||
         (p.resource === 'restaurant' && p.action === 'read')
       )
       .map(p => p._id);
 
     await Role.create({
       name: 'manager',
-      description: 'Manager with menu management access',
+      description: 'Manager with full menu, table, order, and kitchen access',
       permissions: managerPermissions
     });
     console.log('✔ Created manager role');

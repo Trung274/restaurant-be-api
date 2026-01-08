@@ -26,7 +26,10 @@ const seedDefaultAdmin = async () => {
         // Kiểm tra xem admin đã tồn tại chưa
         const adminExists = await User.findOne({ email: 'admin@example.com' });
         if (adminExists) {
-            console.log('⚠️  Default admin already exists');
+            // Cập nhật role cho admin cũ
+            adminExists.role = adminRole._id;
+            await adminExists.save();
+            console.log('✔ Updated existing admin role');
             console.log('   Email: admin@example.com');
             process.exit(0);
         }

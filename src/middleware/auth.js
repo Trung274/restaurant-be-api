@@ -45,7 +45,7 @@ exports.authorize = (...roleNames) => {
     }
 
     const userRoleName = req.user.role.name;
-    
+
     if (!roleNames.includes(userRoleName)) {
       return next(
         new ErrorResponse(
@@ -63,6 +63,11 @@ exports.checkPermission = (resource, action) => {
   return (req, res, next) => {
     if (!req.user) {
       return next(new ErrorResponse('User not authenticated', 401));
+    }
+
+    // Check if role exists
+    if (!req.user.role) {
+      return next(new ErrorResponse('User role not found', 403));
     }
 
     // Admin có tất cả quyền
@@ -91,6 +96,11 @@ exports.checkAnyPermission = (permissions) => {
       return next(new ErrorResponse('User not authenticated', 401));
     }
 
+    // Check if role exists
+    if (!req.user.role) {
+      return next(new ErrorResponse('User role not found', 403));
+    }
+
     if (req.user.role.name === 'admin') {
       return next();
     }
@@ -111,7 +121,7 @@ exports.restrictUserCreation = (req, res, next) => {
   if (req.user && req.user.role.name === 'admin') {
     return next();
   }
-  
+
   // Nếu không có user (tức là đang cố tự đăng ký) -> Reject
   return next(new ErrorResponse('User registration is disabled. Contact administrator.', 403));
 };
