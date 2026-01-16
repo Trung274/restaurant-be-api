@@ -22,13 +22,17 @@ app.use(cors({
   credentials: true
 }));
 
-// Rate Limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-  message: 'Too many requests from this IP, please try again later.'
-});
-app.use('/api/', limiter);
+// Rate Limiting (only in production)
+if (process.env.NODE_ENV === 'production') {
+  const limiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+    message: 'Too many requests from this IP, please try again later.'
+  });
+  app.use('/api/', limiter);
+} else {
+  console.log('⚠️  Rate limiting disabled in development mode');
+}
 
 // Body Parser & Data Sanitization
 app.use(express.json({ limit: '10mb' }));
@@ -57,6 +61,7 @@ app.use(`/api/${API_VERSION}/menu-items`, require('./routes/menuItem.routes'));
 app.use(`/api/${API_VERSION}/tables`, require('./routes/table.routes'));
 app.use(`/api/${API_VERSION}/orders`, require('./routes/order.routes'));
 app.use(`/api/${API_VERSION}/kitchen`, require('./routes/kitchen.routes'));
+app.use(`/api/${API_VERSION}/payments`, require('./routes/payment.routes'));
 app.use('/api/v1/restaurant', restaurantRoutes);
 
 // Root Route

@@ -82,6 +82,13 @@ const seedRolesPermissions = async () => {
       { resource: 'kitchen', action: 'ready', description: 'Mark items as ready' },
       { resource: 'kitchen', action: 'priority', description: 'Update item priority' },
       { resource: 'kitchen', action: 'stats', description: 'View kitchen stats' },
+
+
+      // Payment Management
+      { resource: 'payments', action: 'create', description: 'Process payments' },
+      { resource: 'payments', action: 'read', description: 'View payment details' },
+      { resource: 'payments', action: 'list', description: 'List all payments' },
+      { resource: 'payments', action: 'stats', description: 'View payment statistics' },
     ]);
     console.log('✔ Created permissions');
 
@@ -110,7 +117,7 @@ const seedRolesPermissions = async () => {
     });
     console.log('✔ Created user role');
 
-    // Operations Role (table operations + orders + kitchen read)
+    // Operations Role (table operations + orders + kitchen read + payment)
     const operationsPermissions = permissions
       .filter(p =>
         p.resource === 'profile' ||
@@ -118,18 +125,19 @@ const seedRolesPermissions = async () => {
         (p.resource === 'tables' && ['read', 'list', 'check-in', 'reserve', 'checkout', 'clean'].includes(p.action)) ||
         (p.resource === 'menu-items' && ['read', 'list'].includes(p.action)) ||
         (p.resource === 'orders' && ['create', 'read', 'serve'].includes(p.action)) ||
-        (p.resource === 'kitchen' && p.action === 'read')
+        (p.resource === 'kitchen' && p.action === 'read') ||
+        (p.resource === 'payments' && p.action === 'create')
       )
       .map(p => p._id);
 
     await Role.create({
       name: 'operations',
-      description: 'Operations staff with table, order, and kitchen queue access',
+      description: 'Operations staff with table, order, kitchen queue, and payment access',
       permissions: operationsPermissions
     });
     console.log('✔ Created operations role');
 
-    // Manager Role (full menu, table, orders, and kitchen management)
+    // Manager Role (full menu, table, orders, kitchen, and payment management)
     const managerPermissions = permissions
       .filter(p =>
         p.resource === 'profile' ||
@@ -137,22 +145,31 @@ const seedRolesPermissions = async () => {
         p.resource === 'tables' ||
         p.resource === 'orders' ||
         p.resource === 'kitchen' ||
+        p.resource === 'payments' ||
         (p.resource === 'restaurant' && p.action === 'read')
       )
       .map(p => p._id);
 
     await Role.create({
       name: 'manager',
-      description: 'Manager with full menu, table, order, and kitchen access',
+      description: 'Manager with full menu, table, order, kitchen, and payment access',
       permissions: managerPermissions
     });
     console.log('✔ Created manager role');
 
-    // Accountant Role (same permissions as user)
+    // Accountant Role (payment viewing permissions)
+    const accountantPermissions = permissions
+      .filter(p =>
+        p.resource === 'profile' ||
+        (p.resource === 'restaurant' && p.action === 'read') ||
+        (p.resource === 'payments' && ['read', 'list', 'stats'].includes(p.action))
+      )
+      .map(p => p._id);
+
     await Role.create({
       name: 'accountant',
-      description: 'Accountant with user-level access',
-      permissions: userPermissions
+      description: 'Accountant with payment and financial reporting access',
+      permissions: accountantPermissions
     });
     console.log('✔ Created accountant role');
 

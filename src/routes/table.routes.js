@@ -306,7 +306,7 @@ router.post('/:id/reserve', protect, authorize('operations', 'manager', 'admin')
  *             properties:
  *               paymentMethod:
  *                 type: string
- *                 enum: [cash, card, e-wallet, bank-transfer]
+ *                 enum: [cash, card, others, bank-transfer]
  *                 example: cash
  *               tax:
  *                 type: number

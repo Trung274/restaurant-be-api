@@ -149,8 +149,8 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
         enum: {
-            values: ['cash', 'card', 'e-wallet', 'bank-transfer'],
-            message: 'Payment method must be one of: cash, card, e-wallet, bank-transfer'
+            values: ['cash', 'card', 'others', 'bank-transfer'],
+            message: 'Payment method must be one of: cash, card, others, bank-transfer'
         }
     },
     paymentStatus: {
