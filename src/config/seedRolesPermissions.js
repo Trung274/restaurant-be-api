@@ -84,11 +84,20 @@ const seedRolesPermissions = async () => {
       { resource: 'kitchen', action: 'stats', description: 'View kitchen stats' },
 
 
+
       // Payment Management
       { resource: 'payments', action: 'create', description: 'Process payments' },
       { resource: 'payments', action: 'read', description: 'View payment details' },
       { resource: 'payments', action: 'list', description: 'List all payments' },
       { resource: 'payments', action: 'stats', description: 'View payment statistics' },
+
+      // Customer Management
+      { resource: 'customers', action: 'create', description: 'Create customers' },
+      { resource: 'customers', action: 'read', description: 'View customer details' },
+      { resource: 'customers', action: 'list', description: 'List all customers' },
+      { resource: 'customers', action: 'update', description: 'Update customers' },
+      { resource: 'customers', action: 'delete', description: 'Delete customers' },
+      { resource: 'customers', action: 'stats', description: 'View customer statistics' },
     ]);
     console.log('✔ Created permissions');
 
@@ -117,7 +126,7 @@ const seedRolesPermissions = async () => {
     });
     console.log('✔ Created user role');
 
-    // Operations Role (table operations + orders + kitchen read + payment)
+    // Operations Role (table operations + orders + kitchen read + payment + customers)
     const operationsPermissions = permissions
       .filter(p =>
         p.resource === 'profile' ||
@@ -126,18 +135,19 @@ const seedRolesPermissions = async () => {
         (p.resource === 'menu-items' && ['read', 'list'].includes(p.action)) ||
         (p.resource === 'orders' && ['create', 'read', 'serve'].includes(p.action)) ||
         (p.resource === 'kitchen' && p.action === 'read') ||
-        (p.resource === 'payments' && p.action === 'create')
+        (p.resource === 'payments' && p.action === 'create') ||
+        (p.resource === 'customers' && ['create', 'read', 'list'].includes(p.action))
       )
       .map(p => p._id);
 
     await Role.create({
       name: 'operations',
-      description: 'Operations staff with table, order, kitchen queue, and payment access',
+      description: 'Operations staff with table, order, kitchen, payment, and customer access',
       permissions: operationsPermissions
     });
     console.log('✔ Created operations role');
 
-    // Manager Role (full menu, table, orders, kitchen, and payment management)
+    // Manager Role (full menu, table, orders, kitchen, payment, and customer management)
     const managerPermissions = permissions
       .filter(p =>
         p.resource === 'profile' ||
@@ -146,13 +156,14 @@ const seedRolesPermissions = async () => {
         p.resource === 'orders' ||
         p.resource === 'kitchen' ||
         p.resource === 'payments' ||
+        p.resource === 'customers' ||
         (p.resource === 'restaurant' && p.action === 'read')
       )
       .map(p => p._id);
 
     await Role.create({
       name: 'manager',
-      description: 'Manager with full menu, table, order, kitchen, and payment access',
+      description: 'Manager with full menu, table, order, kitchen, payment, and customer access',
       permissions: managerPermissions
     });
     console.log('✔ Created manager role');

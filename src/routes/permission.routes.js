@@ -18,7 +18,7 @@ router.use(authorize('admin'));
  * @swagger
  * /api/v1/permissions:
  *   get:
- *     summary: Get all permissions
+ *     summary: Get all permissions (Admin only)
  *     tags: [Permissions]
  *     security:
  *       - bearerAuth: []
@@ -32,7 +32,7 @@ router.use(authorize('admin'));
  *       200:
  *         description: List of permissions
  */
-router.get('/', 
+router.get('/',
   checkPermission('permissions', 'list'),
   permissionController.getAllPermissions
 );
@@ -41,7 +41,7 @@ router.get('/',
  * @swagger
  * /api/v1/permissions/{id}:
  *   get:
- *     summary: Get permission by ID
+ *     summary: Get permission by ID (Admin only)
  *     tags: [Permissions]
  *     security:
  *       - bearerAuth: []
@@ -57,7 +57,7 @@ router.get('/',
  *       404:
  *         description: Permission not found
  */
-router.get('/:id', 
+router.get('/:id',
   checkPermission('permissions', 'read'),
   permissionController.getPermissionById
 );
@@ -66,7 +66,7 @@ router.get('/:id',
  * @swagger
  * /api/v1/permissions:
  *   post:
- *     summary: Create new permission
+ *     summary: Create new permission (Admin only)
  *     tags: [Permissions]
  *     security:
  *       - bearerAuth: []
@@ -92,7 +92,7 @@ router.get('/:id',
  *       201:
  *         description: Permission created
  */
-router.post('/', 
+router.post('/',
   checkPermission('permissions', 'create'),
   permissionController.createPermission
 );
@@ -101,7 +101,7 @@ router.post('/',
  * @swagger
  * /api/v1/permissions/{id}:
  *   put:
- *     summary: Update permission
+ *     summary: Update permission (Admin only)
  *     tags: [Permissions]
  *     security:
  *       - bearerAuth: []
@@ -115,48 +115,19 @@ router.post('/',
  *       200:
  *         description: Permission updated
  */
-router.put('/:id', 
+router.put('/:id',
   checkPermission('permissions', 'update'),
   permissionController.updatePermission
 );
 
-/**
- * @swagger
- * /api/v1/permissions/{id}:
- *   put:
- *     summary: Update permission
- *     tags: [Permissions]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:              
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               description:
- *                 type: string
- *                 example: "Updated description"
- *               isActive:
- *                 type: boolean
- *                 example: true
- *     responses:
- *       200:
- *         description: Permission updated
- */
+
 
 
 /**
  * @swagger
  * /api/v1/permissions/{id}:
  *   delete:
- *     summary: Delete permission
+ *     summary: Delete permission (Admin only)
  *     tags: [Permissions]
  *     security:
  *       - bearerAuth: []
@@ -175,7 +146,7 @@ router.put('/:id',
  *       403:
  *         description: Forbidden - Admin only
  */
-router.delete('/:id', 
+router.delete('/:id',
   checkPermission('permissions', 'delete'),
   permissionController.deletePermission
 );

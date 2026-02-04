@@ -18,7 +18,7 @@ router.use(authorize('admin'));
  * @swagger
  * /api/v1/roles:
  *   get:
- *     summary: Get all roles
+ *     summary: Get all roles (Admin only)
  *     tags: [Roles]
  *     security:
  *       - bearerAuth: []
@@ -26,7 +26,7 @@ router.use(authorize('admin'));
  *       200:
  *         description: List of roles
  */
-router.get('/', 
+router.get('/',
   checkPermission('roles', 'list'),
   roleController.getAllRoles
 );
@@ -35,7 +35,7 @@ router.get('/',
  * @swagger
  * /api/v1/roles/{id}:
  *   get:
- *     summary: Get role by ID
+ *     summary: Get role by ID (Admin only)
  *     tags: [Roles]
  *     security:
  *       - bearerAuth: []
@@ -51,7 +51,7 @@ router.get('/',
  *       404:
  *         description: Role not found
  */
-router.get('/:id', 
+router.get('/:id',
   checkPermission('roles', 'read'),
   roleController.getRoleById
 );
@@ -60,7 +60,7 @@ router.get('/:id',
  * @swagger
  * /api/v1/roles:
  *   post:
- *     summary: Create new role
+ *     summary: Create new role (Admin only)
  *     tags: [Roles]
  *     security:
  *       - bearerAuth: []
@@ -85,7 +85,7 @@ router.get('/:id',
  *       201:
  *         description: Role created
  */
-router.post('/', 
+router.post('/',
   checkPermission('roles', 'create'),
   roleController.createRole
 );
@@ -94,7 +94,7 @@ router.post('/',
  * @swagger
  * /api/v1/roles/{id}:
  *   put:
- *     summary: Update role
+ *     summary: Update role (Admin only)
  *     tags: [Roles]
  *     security:
  *       - bearerAuth: []
@@ -127,7 +127,7 @@ router.post('/',
  *       200:
  *         description: Role updated
  */
-router.put('/:id', 
+router.put('/:id',
   checkPermission('roles', 'update'),
   roleController.updateRole
 );
@@ -136,7 +136,7 @@ router.put('/:id',
  * @swagger
  * /api/v1/roles/{id}:
  *   delete:
- *     summary: Delete role
+ *     summary: Delete role (Admin only)
  *     tags: [Roles]
  *     security:
  *       - bearerAuth: []
@@ -150,7 +150,7 @@ router.put('/:id',
  *       200:
  *         description: Role deleted
  */
-router.delete('/:id', 
+router.delete('/:id',
   checkPermission('roles', 'delete'),
   roleController.deleteRole
 );

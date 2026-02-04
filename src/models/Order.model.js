@@ -88,6 +88,27 @@ const orderSchema = new mongoose.Schema({
         trim: true
     },
 
+    // Customer Reference (optional - for members)
+    customerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Customer',
+        default: null
+    },
+
+    // Guest Info (for non-members)
+    guestInfo: {
+        name: {
+            type: String,
+            trim: true,
+            maxlength: [100, 'Guest name cannot be more than 100 characters']
+        },
+        phone: {
+            type: String,
+            trim: true,
+            maxlength: [20, 'Phone number cannot be more than 20 characters']
+        }
+    },
+
     // Order Status (computed from items' kitchen status)
     status: {
         type: String,
@@ -190,6 +211,7 @@ orderSchema.index({ status: 1 });
 orderSchema.index({ 'items.kitchenStatus': 1 });
 orderSchema.index({ checkInTime: -1 });
 orderSchema.index({ createdAt: -1 });
+orderSchema.index({ customerId: 1 });
 
 // Virtual for duration
 orderSchema.virtual('duration').get(function () {

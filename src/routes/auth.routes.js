@@ -129,7 +129,7 @@ router.post('/refresh-token', authController.refreshToken);
  * @swagger
  * /api/v1/auth/logout:
  *   post:
- *     summary: Logout user
+ *     summary: Logout user (Authenticated users)
  *     tags: [Authentication]
  *     security:
  *       - bearerAuth: []
@@ -154,7 +154,7 @@ router.post('/logout', protect, authController.logout);
  * @swagger
  * /api/v1/auth/me:
  *   get:
- *     summary: Get current user
+ *     summary: Get current user (Authenticated users)
  *     tags: [Authentication]
  *     security:
  *       - bearerAuth: []

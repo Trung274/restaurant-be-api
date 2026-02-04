@@ -17,7 +17,7 @@ router.use(protect);
  * @swagger
  * /api/v1/restaurant:
  *   get:
- *     summary: Get restaurant information
+ *     summary: Get restaurant information (Authenticated users)
  *     tags: [Restaurant]
  *     security:
  *       - bearerAuth: []
@@ -57,7 +57,7 @@ router.use(protect);
  *       403:
  *         description: Forbidden - Admin only
  */
-router.get('/', 
+router.get('/',
   restaurantController.getRestaurant
 );
 
@@ -65,7 +65,7 @@ router.get('/',
  * @swagger
  * /api/v1/restaurant:
  *   put:
- *     summary: Update restaurant information
+ *     summary: Update restaurant information (Admin only)
  *     tags: [Restaurant]
  *     security:
  *       - bearerAuth: []
@@ -112,7 +112,7 @@ router.get('/',
  *       403:
  *         description: Forbidden - Admin only
  */
-router.put('/', 
+router.put('/',
   authorize('admin'),
   checkPermission('restaurant', 'update'),
   restaurantController.updateRestaurant

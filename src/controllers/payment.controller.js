@@ -1,5 +1,6 @@
 const Payment = require('../models/Payment.model');
 const Order = require('../models/Order.model');
+const Customer = require('../models/Customer.model');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -39,6 +40,14 @@ exports.createPayment = asyncHandler(async (req, res, next) => {
     order.paymentStatus = 'paid';
     order.paymentMethod = paymentMethod || 'cash';
     await order.save();
+
+    // Update customer stats if order has customerId
+    if (order.customerId) {
+        const customer = await Customer.findById(order.customerId);
+        if (customer) {
+            await customer.updateStats(order.totalAmount);
+        }
+    }
 
     // Populate payment details
     await payment.populate('processedBy', 'name email');

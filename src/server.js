@@ -62,6 +62,7 @@ app.use(`/api/${API_VERSION}/tables`, require('./routes/table.routes'));
 app.use(`/api/${API_VERSION}/orders`, require('./routes/order.routes'));
 app.use(`/api/${API_VERSION}/kitchen`, require('./routes/kitchen.routes'));
 app.use(`/api/${API_VERSION}/payments`, require('./routes/payment.routes'));
+app.use(`/api/${API_VERSION}/customers`, require('./routes/customer.routes'));
 app.use('/api/v1/restaurant', restaurantRoutes);
 
 // Root Route

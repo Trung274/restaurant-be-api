@@ -23,7 +23,7 @@ router.use(protect);
  * @swagger
  * /api/v1/kitchen/queue:
  *   get:
- *     summary: Get kitchen queue
+ *     summary: Get kitchen queue (Chef/Kitchen-staff/Manager/Admin)
  *     tags: [Kitchen]
  *     security:
  *       - bearerAuth: []
@@ -58,7 +58,7 @@ router.get('/queue', checkPermission('kitchen', 'read'), getKitchenQueue);
  * @swagger
  * /api/v1/kitchen/stats:
  *   get:
- *     summary: Get kitchen statistics
+ *     summary: Get kitchen statistics (Manager/Admin)
  *     tags: [Kitchen]
  *     security:
  *       - bearerAuth: []
@@ -98,7 +98,7 @@ router.get('/stats', checkPermission('kitchen', 'stats'), getKitchenStats);
  * @swagger
  * /api/v1/kitchen/items/{itemId}/start:
  *   patch:
- *     summary: Start preparing an item
+ *     summary: Start preparing an item (Chef/Kitchen-staff/Manager/Admin)
  *     tags: [Kitchen]
  *     security:
  *       - bearerAuth: []
@@ -137,7 +137,7 @@ router.patch('/items/:itemId/start', checkPermission('kitchen', 'start'), startP
  * @swagger
  * /api/v1/kitchen/items/{itemId}/ready:
  *   patch:
- *     summary: Mark item as ready
+ *     summary: Mark item as ready (Chef/Kitchen-staff/Manager/Admin)
  *     tags: [Kitchen]
  *     security:
  *       - bearerAuth: []
@@ -176,7 +176,7 @@ router.patch('/items/:itemId/ready', checkPermission('kitchen', 'ready'), markIt
  * @swagger
  * /api/v1/kitchen/items/{itemId}/priority:
  *   patch:
- *     summary: Update item priority
+ *     summary: Update item priority (Manager/Admin)
  *     tags: [Kitchen]
  *     security:
  *       - bearerAuth: []

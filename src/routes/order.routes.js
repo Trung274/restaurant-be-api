@@ -25,7 +25,7 @@ router.use(protect);
  * @swagger
  * /api/v1/orders/stats:
  *   get:
- *     summary: Get order statistics
+ *     summary: Get order statistics (Manager/Admin)
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -41,7 +41,7 @@ router.get('/stats', checkPermission('orders', 'read'), getOrderStats);
  * @swagger
  * /api/v1/orders:
  *   get:
- *     summary: Get all orders
+ *     summary: Get all orders (Waiter/Manager/Admin)
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -69,7 +69,7 @@ router.get('/stats', checkPermission('orders', 'read'), getOrderStats);
  *       401:
  *         description: Unauthorized
  *   post:
- *     summary: Create new order
+ *     summary: Create new order (Waiter/Manager/Admin)
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -141,7 +141,7 @@ router.route('/')
  * @swagger
  * /api/v1/orders/{id}:
  *   get:
- *     summary: Get single order
+ *     summary: Get single order (Waiter/Manager/Admin)
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -167,7 +167,7 @@ router.route('/:id')
  * @swagger
  * /api/v1/orders/{id}/add-items:
  *   patch:
- *     summary: Add items to existing order
+ *     summary: Add items to existing order (Waiter/Manager/Admin)
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -220,7 +220,7 @@ router.patch('/:id/add-items', checkPermission('orders', 'update'), addItemsToOr
  * @swagger
  * /api/v1/orders/{id}/serve-all:
  *   patch:
- *     summary: Mark all items as served
+ *     summary: Mark all items as served (Waiter/Manager/Admin)
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -247,7 +247,7 @@ router.patch('/:id/serve-all', checkPermission('orders', 'serve'), serveAllItems
  * @swagger
  * /api/v1/orders/{id}/cancel:
  *   patch:
- *     summary: Cancel order
+ *     summary: Cancel order (Waiter/Manager/Admin)
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
