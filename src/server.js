@@ -15,6 +15,9 @@ connectDB();
 
 const app = express();
 
+// Trust reverse proxy
+app.set('trust proxy', 1);
+
 // Security Middleware
 app.use(helmet());
 app.use(cors({
