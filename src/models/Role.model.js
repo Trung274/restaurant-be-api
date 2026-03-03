@@ -34,7 +34,7 @@ roleSchema.index({ name: 1 });
 roleSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'permissions',
-    select: 'resource action description'
+    select: 'resource action description isActive'
   });
   next();
 });
