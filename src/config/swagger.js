@@ -15,9 +15,11 @@ const options = {
     servers: [
       ...(process.env.RENDER_EXTERNAL_URL
         ? [{
-            url: process.env.RENDER_EXTERNAL_URL,
-            description: 'Production server'
-          }]
+          url: process.env.NODE_ENV === 'production'
+            ? `https://${process.env.RENDER_EXTERNAL_HOSTNAME }`
+            : `http://localhost:${process.env.PORT || 5000}`,
+          description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server'
+        }]
         : []),
       {
         url: `http://localhost:${process.env.PORT || 5000}`,
